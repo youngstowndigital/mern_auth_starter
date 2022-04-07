@@ -11,6 +11,7 @@ const router = Router();
 router.post(
     "/signup",
     body("firstName").notEmpty().withMessage("First name is required"),
+    body("lastName").notEmpty().withMessage("Last name is required"),
     body("password").notEmpty().withMessage("Password is required"),
     body("username").isEmail().withMessage("Email is required"),
     async (req, res) => {
@@ -37,7 +38,11 @@ router.post(
     }
 );
 
-router.post("/login", passport.authenticate("local"), async (req, res) => {
+router.post(
+    "/login",
+    passport.authenticate("local"), 
+    async (req, res) => {
+
     const token = getToken({ _id: req.user._id });
     const refreshToken = getRefreshToken({ _id: req.user._id });
 

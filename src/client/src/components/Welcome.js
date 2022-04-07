@@ -1,44 +1,21 @@
 import React, { useContext, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../context/UserContext';
-import axios from 'axios';
 import Button from '@mui/material/Button';
+import { AuthContext } from '../context/AuthContext';
 
 const Welcome = () => {
-    const [userContext, setUserContext] = useContext(UserContext);
+    const navigate = useNavigate();
+    const { logout } = useContext(AuthContext);
+    const { user, fetchUserDetails } = useContext(UserContext);
 
-    const fetchUserDetails = async () => {
-        try {
-            const response = await axios.get(`${process.env.REACT_APP_API_ENDPOINT}users/me`, { withCredentials: true, headers: {
-                "Authorization": `Bearer ${userContext.token}`
-            } });
-            setUserContext(oldValues => {
-                return { ...oldValues, details: response.data }
-            });
-        } catch (error) {
-            setUserContext(oldValues => {
-                return { ...oldValues, details: null }
-            });
-        }
-    }
-
-    const logout = async () => {
-        try {
-            await axios.get(`${process.env.REACT_APP_API_ENDPOINT}users/logout`, { withCredentials: true, headers: {
-                "Authorization": `Bearer ${userContext.token}`
-            } });
-            setUserContext(oldValues => {
-                return { ...oldValues, details: undefined, token: null }
-            });
-        } catch (error) {
-            setUserContext(oldValues => {
-                return { ...oldValues, details: null }
-            });
-        }
+    const logoutClick = async (e) => {
+        await logout();
+        navigate('/login');
     }
 
     useEffect(() => {
-        if (!userContext.details)
-            fetchUserDetails();
+        fetchUserDetails();
     }, [])
 
     return (
@@ -47,15 +24,15 @@ const Welcome = () => {
                 <p>
                     Welcome&nbsp;
                     <strong>
-                    {userContext.details?.firstName}
-                    {userContext.details?.lastName &&
-                        " " + userContext?.details.lastName}
+                    {user.details?.firstName}
+                    {user.details?.lastName &&
+                        " " + user?.details.lastName}
                     </strong>!
                 </p>
                 <p>
-                    Your reward points: <strong>{userContext.details?.points}</strong>
+                    Your reward points: <strong>{user.details?.points}</strong>
                 </p>
-                <Button onClick={logout}>Logout</Button>
+                <Button onClick={logoutClick}>Logout</Button>
             </div>
         </div>
     );

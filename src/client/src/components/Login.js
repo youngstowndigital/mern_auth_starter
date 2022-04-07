@@ -1,20 +1,20 @@
 import React, { useState, useContext } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
-import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
-import { UserContext } from '../context/UserContext';
-import axios from 'axios';
+import Alert from '@mui/material/Alert';
+import { AuthContext } from '../context/AuthContext';
 
 const Copyright = (props) =>
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
         {'Copyright © '}
-        <Link color="inherit" href="https://mui.com/">
-            Your Website
+        <Link color="inherit" to="/">
+            Link Page
         </Link>{' '}
         {new Date().getFullYear()}
         {'.'}
@@ -22,8 +22,10 @@ const Copyright = (props) =>
 
 const Login = () => {
     const [formData, setFormData] = useState({ username: '', password: '' });
-    const [error, setError] = useState("");
-    const [userContext, setUserContext] = useContext(UserContext);
+    const { login } = useContext(AuthContext);
+    const [error, setError] = useState(null);
+
+    const navigate = useNavigate();
 
     const { username, password } = formData;
 
@@ -32,15 +34,14 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post(`${process.env.REACT_APP_API_ENDPOINT}users/login`, formData, { withCredentials: true });
-            console.log(response.data);
-            setUserContext(oldValues => {
-                return { ...oldValues, token: response.data.token }
-            });
-            setFormData({ username: '', password: '' });   
+            await login(formData);
+            navigate('/welcome');
         } catch (error) {
-            console.log(error);
-            setError("Invalid email/password");
+            console.log(error.response.data.errors);
+            setError("Invalid username/password");
+            setTimeout(() => {
+                setError(null);
+            }, 3000)
         }
     }
 
@@ -61,6 +62,7 @@ const Login = () => {
                     Sign in
                 </Typography>
                 <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+                    { error && <Alert severity='error' sx={{ m: 2 }}>{ error }</Alert> }
                     <TextField
                         onChange={onInputChange}
                         value={username}
@@ -95,7 +97,7 @@ const Login = () => {
                     </Button>
                     <Grid container>
                     <Grid item>
-                        <Link href="#" variant="body2">
+                        <Link to="/signup" variant="body2">
                         {"Don't have an account? Sign Up"}
                         </Link>
                     </Grid>

@@ -1,20 +1,20 @@
 import React, { useState, useContext } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import Avatar from '@mui/material/Avatar';
+import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
-import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
-import axios from 'axios';
-import { UserContext } from '../context/UserContext';
+import { AuthContext } from '../context/AuthContext';
 
 const Copyright = (props) =>
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
         {'Copyright © '}
-        <Link color="inherit" href="https://mui.com/">
-            Your Website
+        <Link color="inherit" to="/">
+            Link Page
         </Link>{' '}
         {new Date().getFullYear()}
         {'.'}
@@ -27,8 +27,10 @@ const Signup = () => {
         firstName: '',
         lastName: ''
     });
-    const [error, setError] = useState("");
-    const [userContext, setUserContext] = useContext(UserContext);
+    const [errors, setErrors] = useState([]);
+    const { signup } = useContext(AuthContext);
+
+    const navigate = useNavigate();
 
     const { username, password, firstName, lastName } = formData;
 
@@ -37,15 +39,14 @@ const Signup = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post(`${process.env.REACT_APP_API_ENDPOINT}users/signup`, formData, { withCredentials: true });
-            console.log(response.data);
-            setUserContext(oldValues => {
-                return { ...oldValues, token: response.data.token }
-            });
-            setFormData({ username: '', password: '', firstName: '', lastName: '' });   
+            await signup(formData);
+            navigate('/welcome');
         } catch (error) {
-            console.log(error);
-            setError("Invalid signup");
+            console.log(error.response.data.errors);
+            setErrors(error.response.data.errors);
+            setTimeout(() => {
+                setErrors([]);
+            }, 3000)
         }
     }
 
@@ -66,6 +67,7 @@ const Signup = () => {
                     Sign up
                 </Typography>
                 <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+                    { errors.map((error, i) => <Alert severity='error' sx={{ m: 2 }} key={i}>{ error.msg }</Alert>) }
                     <TextField
                         onChange={onInputChange}
                         value={firstName}
@@ -118,12 +120,12 @@ const Signup = () => {
                         variant="contained"
                         sx={{ mt: 3, mb: 2 }}
                     >
-                        Sign In
+                        Sign Up
                     </Button>
                     <Grid container>
                     <Grid item>
-                        <Link href="#" variant="body2">
-                        {"Have an account? Sign in"}
+                        <Link to="/login" variant="body2">
+                            {"Have an account? Sign in"}
                         </Link>
                     </Grid>
                     </Grid>
