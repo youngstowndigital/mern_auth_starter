@@ -1,0 +1,38 @@
+{
+  "name": "linkpage_app",
+  "version": "1.0.0",
+  "description": "Application for creating custom link pages",
+  "main": "index.js",
+  "scripts": {
+    "build": "babel src/api/index.js -d dist",
+    "start": "babel-watch src/api/index.js && npm run build && nodemon dist/index.js"
+  },
+  "author": "Mike Wittenauer",
+  "license": "MIT",
+  "dependencies": {
+    "babel-watch": "^7.7.0",
+    "body-parser": "^1.20.0",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.0",
+    "express": "^4.17.3",
+    "express-validator": "^6.14.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongodb-memory-server": "^8.4.2",
+    "mongoose": "^6.2.9",
+    "oauth2orize": "^1.11.1",
+    "passport": "^0.5.2",
+    "passport-http-bearer": "^1.0.1",
+    "passport-jwt": "^4.0.0",
+    "passport-local": "^1.0.0",
+    "passport-local-mongoose": "^7.0.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.17.6",
+    "@babel/core": "^7.17.8",
+    "@babel/plugin-transform-runtime": "^7.17.0",
+    "@babel/preset-env": "^7.16.11",
+    "@babel/runtime": "^7.17.8",
+    "nodemon": "^2.0.15"
+  }
+}
